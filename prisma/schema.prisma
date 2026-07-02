@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GoalType {
+  TIMER
+  CHAPTER
+  QUESTIONS
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model Goal {
+  id         String   @id @default(cuid())
+  title      String
+  goalType   GoalType
+  target     Int
+  progress   Int      @default(0)
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sessions   StudySession[]
+}
+
+model StudySession {
+  id         String   @id @default(cuid())
+
+  goalId     String
+  goal       Goal @relation(fields: [goalId], references: [id])
+
+  status     SessionStatus @default(ACTIVE)
+
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+
+  createdAt  DateTime @default(now())
+}
+model Medicine {
+  id          String   @id @default(cuid())
+  name        String
+  dosage      String?
+  reminderAt  String
+  takenToday  Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+}
+model AppSettings{
+  id             String @id @default(cuid())
+  waterReminderInterval Int @default(30)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
