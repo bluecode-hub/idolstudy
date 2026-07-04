@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { GoalType } from "@prisma/client";
 import { NextResponse } from "next/server";
+
+const goalTypes = ["TIMER", "CHAPTER", "QUESTIONS"] as const;
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!Object.values(GoalType).includes(body.goalType)) {
+  if (!goalTypes.includes(body.goalType)) {
     return NextResponse.json(
       { error: "Invalid goal type." },
       { status: 400 },
