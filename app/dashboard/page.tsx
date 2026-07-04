@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { DeleteGoalButton } from "./DeleteGoalButton";
-import {StartSessionButton} from "./StartSessionButton";
+import { StartSessionButton } from "./StartSessionButton";
 import Link from "next/link";
+import UpcomingMeetings from "@/app/components/UpcomingMeeting";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,8 @@ export default async function DashboardPage() {
       createdAt: "desc",
     },
   });
-return (
+
+  return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -23,14 +25,38 @@ return (
           </h1>
         </div>
 
-        <Link
-          href="/dashboard/new-goal"
-          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-        >
-          + New Goal
-        </Link>
-        
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/dashboard/new-goal"
+            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            + New Goal
+          </Link>
+
+          <Link
+            href="/medicine/new"
+            className="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
+          >
+            Add Medicine
+          </Link>
+
+          <Link
+            href="/medicine"
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            Medicines
+          </Link>
+
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            Login
+          </Link>
+        </div>
       </div>
+
+      <UpcomingMeetings />
 
       {goals.length === 0 ? (
         <section className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
@@ -88,10 +114,12 @@ return (
               </p>
 
               <div className="mt-5 space-y-2">
-                <StartSessionButton goalId={goal.id}/>
-                <DeleteGoalButton goalId={goal.id}/>
+                <StartSessionButton goalId={goal.id} />
+                <DeleteGoalButton goalId={goal.id} />
               </div>
+              
             </article>
+            
           );
         })}
         </section>
