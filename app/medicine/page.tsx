@@ -4,8 +4,16 @@ import { isDatabaseConnectionError } from "@/lib/db-errors";
 
 export const dynamic = "force-dynamic";
 
+type MedicineReminder = {
+  id: string;
+  name: string;
+  dosage: string | null;
+  reminderAt: string;
+  takenToday: boolean;
+};
+
 export default async function MedicinePage() {
-  let medicines: Awaited<ReturnType<typeof prisma.medicine.findMany>> = [];
+  let medicines: MedicineReminder[] = [];
   let databaseUnavailable = false;
 
   try {
