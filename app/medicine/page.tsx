@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import type { Medicine } from "@prisma/client";
 import DeleteMedicineButton from "./DeleteMedicineButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function MedicinePage() {
-  const medicines = await prisma.medicine.findMany({
+  const medicines: Medicine[] = await prisma.medicine.findMany({
     orderBy: {
       reminderAt: "asc",
     },
