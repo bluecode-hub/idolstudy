@@ -6,8 +6,16 @@ import UpcomingMeetings from "@/app/components/UpcomingMeeting";
 
 export const dynamic = "force-dynamic";
 
+type DashboardGoal = {
+  id: string;
+  title: string;
+  goalType: string;
+  target: number;
+  progress: number;
+};
+
 export default async function DashboardPage() {
-  const goals = await prisma.goal.findMany({
+  const goals: DashboardGoal[] = await prisma.goal.findMany({
     orderBy: {
       createdAt: "desc",
     },
