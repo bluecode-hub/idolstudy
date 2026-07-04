@@ -1,14 +1,29 @@
 "use client";
 
-import type { Goal, Medicine } from "@prisma/client";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+type StudyGoal = {
+  id: string;
+  title: string;
+  goalType: string;
+  target: number;
+  progress: number;
+};
+
+type StudyMedicine = {
+  id: string;
+  name: string;
+  dosage: string | null;
+  reminderAt: string;
+  takenToday: boolean;
+};
+
 type Props = {
-  goal: Goal;
+  goal: StudyGoal;
   sessionId: string;
   startedAt: string;
-  medicines: Medicine[];
+  medicines: StudyMedicine[];
 };
 
 type NotificationState = NotificationPermission | "unsupported";
@@ -136,7 +151,7 @@ function reminderTimeTodayMs(reminderAt: string, nowMs: number) {
   return reminderTime.getTime();
 }
 
-function medicineLabel(medicine: Medicine) {
+function medicineLabel(medicine: StudyMedicine) {
   const name = medicine.name.trim();
 
   if (!name || /^\d+$/.test(name)) {
@@ -165,7 +180,7 @@ export function StudySession({ goal, sessionId, startedAt, medicines }: Props) {
     () => startedAtMs + DEFAULT_WATER_REMINDER_MINUTES * 60 * 1000,
   );
   const [showReminders, setShowReminders] = useState(true);
-  const [activeMedicine, setActiveMedicine] = useState<Medicine | null>(null);
+  const [activeMedicine, setActiveMedicine] = useState<StudyMedicine | null>(null);
   const [takenMedicineIds, setTakenMedicineIds] = useState(
     () => new Set(medicines.filter((medicine) => medicine.takenToday).map((medicine) => medicine.id)),
   );
@@ -525,7 +540,7 @@ export function StudySession({ goal, sessionId, startedAt, medicines }: Props) {
         throw new Error("Unable to update progress");
       }
 
-      const updatedGoal: Goal = await response.json();
+      const updatedGoal: StudyGoal = await response.json();
       setProgress(updatedGoal.progress);
     } catch {
       setError("Could not update progress.");

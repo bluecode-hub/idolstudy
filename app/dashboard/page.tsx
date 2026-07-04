@@ -3,6 +3,7 @@ import { DeleteGoalButton } from "./DeleteGoalButton";
 import { StartSessionButton } from "./StartSessionButton";
 import Link from "next/link";
 import UpcomingMeetings from "@/app/components/UpcomingMeeting";
+import { isDatabaseConnectionError } from "@/lib/db-errors";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +16,22 @@ type DashboardGoal = {
 };
 
 export default async function DashboardPage() {
-  const goals: DashboardGoal[] = await prisma.goal.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  let goals: DashboardGoal[] = [];
+  let databaseUnavailable = false;
+
+  try {
+    goals = await prisma.goal.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    if (!isDatabaseConnectionError(error)) {
+      throw error;
+    }
+
+    databaseUnavailable = true;
+  }
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -65,6 +77,13 @@ export default async function DashboardPage() {
       </div>
 
       <UpcomingMeetings />
+
+      {databaseUnavailable ? (
+        <section className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+          Database is not reachable right now. Check your Supabase connection
+          string, then refresh this page.
+        </section>
+      ) : null}
 
       {goals.length === 0 ? (
         <section className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">

@@ -1,19 +1,37 @@
 import { prisma } from "@/lib/prisma";
-import type { Medicine } from "@prisma/client";
 import DeleteMedicineButton from "./DeleteMedicineButton";
+import { isDatabaseConnectionError } from "@/lib/db-errors";
 
 export const dynamic = "force-dynamic";
 
 export default async function MedicinePage() {
-  const medicines: Medicine[] = await prisma.medicine.findMany({
-    orderBy: {
-      reminderAt: "asc",
-    },
-  });
+  let medicines: Awaited<ReturnType<typeof prisma.medicine.findMany>> = [];
+  let databaseUnavailable = false;
+
+  try {
+    medicines = await prisma.medicine.findMany({
+      orderBy: {
+        reminderAt: "asc",
+      },
+    });
+  } catch (error) {
+    if (!isDatabaseConnectionError(error)) {
+      throw error;
+    }
+
+    databaseUnavailable = true;
+  }
 
   return (
     <main className="mx-auto max-w-2xl p-8">
       <h1 className="mb-6 text-3xl font-bold">Medicines</h1>
+
+      {databaseUnavailable ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+          Database is not reachable right now. Check your Supabase connection
+          string, then refresh this page.
+        </div>
+      ) : null}
 
       <div className="mt-10 space-y-4">
         {medicines.length === 0 ? (
